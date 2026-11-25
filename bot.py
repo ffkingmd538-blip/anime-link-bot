@@ -560,5 +560,11 @@ async def mview_button_handler(client, callback_query: CallbackQuery):
     )
 
 if __name__ == "__main__":
-    print("🤖 Bot is starting smoothly...")
-    app.run()
+        print("🤖 Bot is starting smoothly...")
+    loop = asyncio.new_event_loop()
+    asyncio.set_event_loop(loop)
+    loop.run_until_complete(app.start())
+    from pyrogram import idle
+    loop.run_until_complete(idle())
+    loop.run_until_complete(app.stop())
+
