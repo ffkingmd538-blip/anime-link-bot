@@ -21,8 +21,10 @@ MONGO_URI = (
     "ac-0ia0zfl-shard-00-02.xkwletj.mongodb.net:27017/"
     "?ssl=true&authSource=admin&retryWrites=true&w=majority"
 )
-loop = asyncio.new_event_loop()
-asyncio.set_event_loop(loop)
+_main_loop = asyncio.new_event_loop()
+asyncio.set_event_loop(_main_loop)
+asyncio.get_event_loop = lambda: _main_loop
+
 
 app = Client("anime_bot", api_id=API_ID, api_hash=API_HASH, bot_token=BOT_TOKEN)
 db_client = AsyncIOMotorClient(MONGO_URI)
