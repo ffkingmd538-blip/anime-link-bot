@@ -551,7 +551,6 @@ async def mview_button_handler(client, callback_query: CallbackQuery):
         menu_doc["anime_name"],
         menu_doc.get("seasons", [])
     )
-        menu_html,
         parse_mode=ParseMode.HTML,
         disable_web_page_preview=True
     )
@@ -571,7 +570,6 @@ if __name__ == "__main__":
     asyncio.run(main())
 
     
-    asyncio.run(main())
     
     
     
