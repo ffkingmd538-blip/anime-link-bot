@@ -557,7 +557,7 @@ async def mview_button_handler(client, callback_query: CallbackQuery):
         disable_web_page_preview=True
     )
     async def main():
-    global db_client, db, seasons_collection, master_menus_collection
+        global db_client, db, seasons_collection, master_menus_collection
     db_client = AsyncIOMotorClient(MONGO_URI)
     db = db_client["anime_database"]
     seasons_collection = db["seasons"]
