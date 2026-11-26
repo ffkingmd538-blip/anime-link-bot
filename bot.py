@@ -21,9 +21,6 @@ MONGO_URI = (
     "ac-0ia0zfl-shard-00-02.xkwletj.mongodb.net:27017/"
     "?ssl=true&authSource=admin&retryWrites=true&w=majority"
 )
-_main_loop = asyncio.new_event_loop()
-asyncio.set_event_loop(_main_loop)
-asyncio.get_event_loop = lambda: _main_loop
 
 
 app = Client("anime_bot", api_id=API_ID, api_hash=API_HASH, bot_token=BOT_TOKEN)
@@ -559,13 +556,15 @@ async def mview_button_handler(client, callback_query: CallbackQuery):
         disable_web_page_preview=True
     )
 
-if __name__ == "__main__":
+async def main():
     print("🤖 Bot is starting smoothly...")
-    loop = asyncio.get_event_loop()
-    loop.run_until_complete(app.start())
-    from pyrogram import idle
-    loop.run_until_complete(idle())
-    loop.run_until_complete(app.stop())
+    async with app:
+        from pyrogram import idle
+        await idle()
+
+if __name__ == "__main__":
+    asyncio.run(main())
+    
     
     
 
