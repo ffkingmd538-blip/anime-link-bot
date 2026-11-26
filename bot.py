@@ -546,11 +546,13 @@ async def mview_button_handler(client, callback_query: CallbackQuery):
     if not menu_doc:
         await callback_query.answer("❌ এই Master Menu পাওয়া যায়নি।", show_alert=True)
         return
-    await callback_query.answer(f"📂 {anime_name}")
+        await callback_query.answer(f"📂 {anime_name}")
     menu_html = build_embedded_menu_html(
         menu_doc["anime_name"],
         menu_doc.get("seasons", [])
     )
+    await callback_query.message.reply_text(
+        menu_html,
         parse_mode=ParseMode.HTML,
         disable_web_page_preview=True
     )
@@ -565,6 +567,7 @@ async def mview_button_handler(client, callback_query: CallbackQuery):
     async with app:
         from pyrogram import idle
         await idle()
+        
 
 if __name__ == "__main__":
     asyncio.run(main())
