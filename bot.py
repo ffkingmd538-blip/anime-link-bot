@@ -559,13 +559,13 @@ async def mview_button_handler(client, callback_query: CallbackQuery):
         disable_web_page_preview=True
     )
 
-async def main():
-    print("🤖 Bot is starting smoothly...")
-    async with app:
-        from pyrogram import idle
-        await idle()
-
 if __name__ == "__main__":
-    asyncio.run(main())
+    print("🤖 Bot is starting smoothly...")
+    loop = asyncio.get_event_loop()
+    loop.run_until_complete(app.start())
+    from pyrogram import idle
+    loop.run_until_complete(idle())
+    loop.run_until_complete(app.stop())
+    
     
 
