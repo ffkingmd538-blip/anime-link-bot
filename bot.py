@@ -24,10 +24,11 @@ MONGO_URI = (
 
 
 app = Client("anime_bot", api_id=API_ID, api_hash=API_HASH, bot_token=BOT_TOKEN)
-db_client = AsyncIOMotorClient(MONGO_URI)
-db = db_client["anime_database"]
-seasons_collection = db["seasons"]
-master_menus_collection = db["master_menus"]
+db_client = None
+db = None
+seasons_collection = None
+master_menus_collection = None
+
 
 user_sessions = {}
 master_menu_sessions = {}
@@ -550,19 +551,25 @@ async def mview_button_handler(client, callback_query: CallbackQuery):
         menu_doc["anime_name"],
         menu_doc.get("seasons", [])
     )
-    await callback_query.message.reply_text(
         menu_html,
         parse_mode=ParseMode.HTML,
         disable_web_page_preview=True
     )
+    async def main():
+    global db_client, db, seasons_collection, master_menus_collection
+    db_client = AsyncIOMotorClient(MONGO_URI)
+    db = db_client["anime_database"]
+    seasons_collection = db["seasons"]
+    master_menus_collection = db["master_menus"]
 
-async def main():
     print("🤖 Bot is starting smoothly...")
     async with app:
         from pyrogram import idle
         await idle()
 
 if __name__ == "__main__":
+    asyncio.run(main())
+    
     asyncio.run(main())
     
     
