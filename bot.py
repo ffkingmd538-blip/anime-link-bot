@@ -557,15 +557,14 @@ async def mview_button_handler(client, callback_query: CallbackQuery):
         parse_mode=ParseMode.HTML,
         disable_web_page_preview=True
     )
-    async def main():
-           global app, db_client, db, seasons_collection, master_menus_collection
-        app = Client("anime_bot", api_id=API_ID, api_hash=API_HASH, bot_token=BOT_TOKEN)
-
-db_client = AsyncIOMotorClient(MONGO_URI)
+async def main():
+    global app, db_client, db, seasons_collection, master_menus_collection
+    app = Client("anime_bot", api_id=API_ID, api_hash=API_HASH, bot_token=BOT_TOKEN)
+    db_client = AsyncIOMotorClient(MONGO_URI)
     db = db_client["anime_database"]
     seasons_collection = db["seasons"]
     master_menus_collection = db["master_menus"]
-
+    
     print("🤖 Bot is starting smoothly...")
     async with app:
         from pyrogram import idle
