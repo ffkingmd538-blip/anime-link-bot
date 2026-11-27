@@ -561,21 +561,42 @@ async def mview_button_handler(client, callback_query: CallbackQuery):
         menu_html,
         parse_mode=ParseMode.HTML,
         disable_web_page_preview=True
-    )
+    from aiohttp import web
+
+
+async def start_health_server():
+    async def health(request):
+        return web.Response(text="Bot is alive")
+
+    app_web = web.Application()
+    app_web.router.add_get("/", health)
+    app_web.router.add_get("/health", health)
+
+    runner = web.AppRunner(app_web)
+    await runner.setup()
+    port = int(os.environ.get("PORT", 10000))
+    site = web.TCPSite(runner, "0.0.0.0", port)
+    await site.start()
+    print(f"Health server running on port {port}")
+
+
 async def main():
+    global db_client, db, seasons_collection, master_menus_collection
     db_client = AsyncIOMotorClient(MONGO_URI)
     db = db_client["anime_database"]
     seasons_collection = db["seasons"]
     master_menus_collection = db["master_menus"]
-    
+
+    await start_health_server()
     print("🤖 Bot is starting smoothly...")
     async with app:
         from pyrogram import idle
         await idle()
-        
+
 
 if __name__ == "__main__":
     asyncio.run(main())
+    
 
     
     
