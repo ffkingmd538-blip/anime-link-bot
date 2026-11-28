@@ -561,8 +561,11 @@ async def mview_button_handler(client, callback_query: CallbackQuery):
         menu_html,
         parse_mode=ParseMode.HTML,
         disable_web_page_preview=True
-    from aiohttp import web
 
+    )
+
+import os
+from aiohttp import web
 
 async def start_health_server():
     async def health(request):
