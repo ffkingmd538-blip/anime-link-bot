@@ -27,8 +27,8 @@ MONGO_URI = (
     "?ssl=true&authSource=admin&retryWrites=true&w=majority"
 )
 
+app = Client("anime_bot", api_id=API_ID, api_hash=API_HASH, bot_token=BOT_TOKEN, workers=50)
 
-app = Client("anime_bot", api_id=API_ID, api_hash=API_HASH, bot_token=BOT_TOKEN)
 
 db_client = None
 db = None
@@ -210,7 +210,8 @@ async def send_season_items(client: Client, chat_id: int, season_doc: dict):
                     sent_ok += 1
                 else:
                     failed_orders.append(entry.get("order", "?"))
-                await asyncio.sleep(0.2)
+                await asyncio.sleep(0.05)
+                
 
             return sent_ok, len(sorted_items), failed_orders
     finally:
