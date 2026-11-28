@@ -182,25 +182,43 @@ async def send_single_item(client: Client, chat_id: int, entry: dict):
                     await asyncio.sleep(1)
                 else:
                     return False
+chat_locks = {}
+chat_pending_codes = {}
+
 
 async def send_season_items(client: Client, chat_id: int, season_doc: dict):
-    items = season_doc.get("items", [])
-    sorted_items = sorted(
-        items,
-        key=lambda x: x.get("order", 0)
-    )
-    sent_ok = 0
-    failed_orders = []
+    season_key = season_doc.get("season_code") or season_doc.get("anime_name", "")
+    pending = chat_pending_codes.setdefault(chat_id, set())
+    if season_key in pending:
+        return 0, 0, []
+    pending.add(season_key)
 
-    for entry in sorted_items:
-        ok = await send_single_item(client, chat_id, entry)
-        if ok:
-            sent_ok += 1
-        else:
-            failed_orders.append(entry.get("order", "?"))
-        await asyncio.sleep(0.3)
+    lock = chat_locks.setdefault(chat_id, asyncio.Lock())
+    try:
+        async with lock:
+            items = season_doc.get("items", [])
+            sorted_items = sorted(
+                items,
+                key=lambda x: x.get("order", 0)
+            )
+            sent_ok = 0
+            failed_orders = []
 
-    return sent_ok, len(sorted_items), failed_orders
+            for entry in sorted_items:
+                ok = await send_single_item(client, chat_id, entry)
+                if ok:
+                    sent_ok += 1
+                else:
+                    failed_orders.append(entry.get("order", "?"))
+                await asyncio.sleep(0.2)
+
+            return sent_ok, len(sorted_items), failed_orders
+    finally:
+        pending.discard(season_key)
+        if not pending and not lock.locked():
+            chat_pending_codes.pop(chat_id, None)
+            chat_locks.pop(chat_id, None)
+            
 
 def format_session_summary(anime_name: str, session: dict) -> str:
     counts = session["counts"]
@@ -228,7 +246,6 @@ async def start_command(client, message: Message):
             if not season_doc:
                 await safe_reply(message, "❌ এই সিজন লিংকটি আর পাওয়া যাচ্ছে না।")
                 return
-            await safe_reply(message, f"📤 {season_doc['anime_name']} পাঠানো হচ্ছে...")
             sent_ok, total_items, failed_orders = await send_season_items(client, message.chat.id, season_doc)
             if failed_orders:
                 await safe_reply(
